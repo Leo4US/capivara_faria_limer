@@ -1,874 +1,439 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full bg-slate-950">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Silly Games Hub — Dopamina & Diversão Rápida</title>
-
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- Canvas Confetti Library for Satisfying Wins -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        candy: {
-                            pink: '#ff4b82',
-                            pinkLight: '#ff85a2',
-                            purple: '#7c3aed',
-                            purpleLight: '#a78bfa',
-                            yellow: '#fbbf24',
-                            mint: '#10b981',
-                            bg: '#110c24',
-                            card: '#1c153b',
-                            border: '#322659'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        game: ['Fredoka', 'sans-serif']
-                    }
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hero Arena & Arcade Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            hero: {
+              bg: '#0a0814',
+              card: '#161228',
+              accent: '#ff0055',
+              gold: '#ffb703',
+              cyan: '#00f0ff',
+              purple: '#7000ff',
+              border: '#2e2550'
             }
+          },
+          fontFamily: {
+            action: ['Teko', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          }
         }
-    </script>
-
-    <style>
-        * {
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-        
-        /* Floating clicker text (+1 animation) */
-        @keyframes floatUpFade {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            50% { opacity: 1; transform: translateY(-40px) scale(1.3); }
-            100% { opacity: 0; transform: translateY(-80px) scale(0.8); }
-        }
-        .float-number {
-            position: absolute;
-            pointer-events: none;
-            font-family: 'Fredoka', sans-serif;
-            font-weight: 700;
-            color: #fbbf24;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-            animation: floatUpFade 0.8s ease-out forwards;
-            z-index: 50;
-        }
-
-        /* Capybara click bounce */
-        .click-bounce {
-            animation: capyTap 0.15s ease-out;
-        }
-        @keyframes capyTap {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.88) rotate(-2deg); }
-            100% { transform: scale(1); }
-        }
-
-        /* Pop animation for Match-3 candy swap */
-        @keyframes candyPop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.25) rotate(5deg); }
-            100% { transform: scale(1); }
-        }
-        .pop-anim {
-            animation: candyPop 0.25s ease-out;
-        }
-
-        /* Custom scrollbar for upgrades list */
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-            border-radius: 999px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 75, 130, 0.4);
-            border-radius: 999px;
-        }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    body { touch-action: manipulation; user-select: none; }
+    .glow-accent { box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+    .glow-cyan { box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+    .glow-gold { box-shadow: 0 0 20px rgba(255, 183, 3, 0.4); }
+  </style>
 </head>
-<body class="h-full bg-candy-bg text-slate-100 font-sans antialiased overflow-x-hidden flex flex-col justify-between selection:bg-candy-pink selection:text-white">
+<body class="bg-hero-bg text-white font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-hero-accent selection:text-white">
 
-    <!-- TOP NAVIGATION HEADER -->
-    <header class="sticky top-0 z-40 bg-slate-950/90 border-b border-candy-border backdrop-blur-md">
-        <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="switchGame('hub')">
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-candy-pink via-purple-500 to-amber-400 flex items-center justify-center text-white text-xl shadow-lg shadow-candy-pink/30 font-game font-bold">
-                    🎲
-                </div>
-                <div>
-                    <h1 class="font-game font-bold text-base leading-none text-white tracking-wide">SILLY GAMES</h1>
-                    <p class="text-[10px] font-semibold text-candy-pinkLight">Mini-Games de Dopamina</p>
-                </div>
-            </div>
-
-            <!-- Total Score & Rewards Badge -->
-            <div class="bg-candy-card px-3 py-1.5 rounded-2xl border border-candy-border flex items-center gap-2">
-                <i class="fa-solid fa-trophy text-amber-400 text-xs"></i>
-                <span id="global-score" class="font-game font-bold text-xs text-amber-300">0 pts</span>
-            </div>
+  <!-- CABEÇALHO DA PLATAFORMA -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-hero-bg/90 border-b border-hero-border px-4 py-3">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-hero-accent via-hero-purple to-hero-cyan flex items-center justify-center font-action font-bold text-2xl text-white shadow-lg shadow-hero-accent/30">
+          ⚡
         </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <main class="max-w-md mx-auto w-full flex-grow p-4 space-y-4">
-
-        <!-- VIEW 0: HUB HOME SELECTOR -->
-        <div id="view-hub" class="space-y-4">
-            <div class="text-center space-y-1.5 py-2">
-                <span class="px-3 py-1 rounded-full bg-candy-pink/15 text-candy-pinkLight text-xs font-bold border border-candy-pink/30 uppercase tracking-wider inline-block">
-                    ⚡ Clique & Divirta-se
-                </span>
-                <h2 class="font-game text-2xl font-bold text-white leading-tight">
-                    Jogos Rápidos & Viciantes
-                </h2>
-                <p class="text-xs text-slate-400 max-w-xs mx-auto">
-                    Escolha um dos protótipos abaixo. Perfeitos para testar o loop de dopamina instantânea!
-                </p>
-            </div>
-
-            <!-- Game Cards Grid -->
-            <div class="grid grid-cols-1 gap-3.5">
-                
-                <!-- Game 1 Card: Capivara Clicker -->
-                <div onclick="switchGame('clicker')" class="p-4 rounded-3xl bg-gradient-to-r from-candy-card to-purple-950/60 border border-candy-border hover:border-candy-pink/60 transition-all cursor-pointer shadow-xl flex items-center justify-between group active:scale-98">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform">
-                            🦫
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest block">Idle & Clicker</span>
-                            <h3 class="font-game font-bold text-base text-white">Capivara Clicker</h3>
-                            <p class="text-xs text-slate-400">Clique para ganhar moedas e comprar cafés e pães de queijo!</p>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-candy-pink text-sm"></i>
-                </div>
-
-                <!-- Game 2 Card: Match-3 Doces do Brasil -->
-                <div onclick="switchGame('match3')" class="p-4 rounded-3xl bg-gradient-to-r from-candy-card to-pink-950/60 border border-candy-border hover:border-candy-pink/60 transition-all cursor-pointer shadow-xl flex items-center justify-between group active:scale-98">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-14 h-14 rounded-2xl bg-candy-pink/20 border border-candy-pink/40 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform">
-                            🍫
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-bold text-candy-pinkLight uppercase tracking-widest block">Estilo Candy Crush</span>
-                            <h3 class="font-game font-bold text-base text-white">Doces do Brasil</h3>
-                            <p class="text-xs text-slate-400">Junte 3 brigadeiros ou beijinhos e faça combos coloridos!</p>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-candy-pink text-sm"></i>
-                </div>
-
-                <!-- Game 3 Card: Capivara Skate Timing -->
-                <div onclick="switchGame('skate')" class="p-4 rounded-3xl bg-gradient-to-r from-candy-card to-emerald-950/60 border border-candy-border hover:border-candy-pink/60 transition-all cursor-pointer shadow-xl flex items-center justify-between group active:scale-98">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform">
-                            🛹
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">1 Botão de Pular</span>
-                            <h3 class="font-game font-bold text-base text-white">Capivara Skate</h3>
-                            <p class="text-xs text-slate-400">Desvie dos buracos e cones em um ritmo frenético!</p>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-candy-pink text-sm"></i>
-                </div>
-
-                <!-- Game 4 Card: Quiz Absurdo -->
-                <div onclick="switchGame('quiz')" class="p-4 rounded-3xl bg-gradient-to-r from-candy-card to-sky-950/60 border border-candy-border hover:border-candy-pink/60 transition-all cursor-pointer shadow-xl flex items-center justify-between group active:scale-98">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-14 h-14 rounded-2xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform">
-                            🧠
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-bold text-sky-400 uppercase tracking-widest block">Pegadinhas Memes</span>
-                            <h3 class="font-game font-bold text-base text-white">Quiz Absurdo</h3>
-                            <p class="text-xs text-slate-400">Responda às perguntas mais engraçadas e pegadinhas com QI!</p>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-candy-pink text-sm"></i>
-                </div>
-
-            </div>
+        <div>
+          <h1 class="font-action text-2xl font-bold tracking-wider leading-none text-white">HERO ARCADE HUB</h1>
+          <p class="text-[9px] text-hero-cyan font-bold tracking-widest uppercase">Arena de Ação & Desafios</p>
         </div>
+      </div>
 
-        <!-- VIEW 1: CAPIVARA CLICKER -->
-        <div id="view-clicker" class="space-y-4 hidden">
-            <!-- Game Top Stats -->
-            <div class="bg-candy-card p-4 rounded-3xl border border-candy-border text-center space-y-1 relative overflow-hidden shadow-xl">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400 block">Capy-Moedas Acumuladas</span>
-                <div class="flex items-center justify-center gap-2">
-                    <span class="text-2xl">🪙</span>
-                    <span id="clicker-coins" class="font-game text-3xl font-extrabold text-white">0</span>
-                </div>
-                <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800 font-medium px-2">
-                    <span>Moedas por clique: <strong id="clicker-cpc" class="text-candy-pinkLight">1</strong></span>
-                    <span>Moedas/seg: <strong id="clicker-cps" class="text-emerald-400">0</strong></span>
-                </div>
-            </div>
+      <div class="flex items-center gap-2 bg-hero-card px-3.5 py-1.5 rounded-2xl border border-hero-border">
+        <span class="text-xs">🪙</span>
+        <span id="global-coins" class="font-action text-xl font-bold text-hero-gold tracking-wide">0</span>
+      </div>
+    </div>
+  </header>
 
-            <!-- Big Capybara Click Target -->
-            <div class="relative bg-gradient-to-b from-purple-950/40 to-slate-900/80 rounded-3xl p-6 border border-candy-border flex flex-col items-center justify-center min-h-[220px] shadow-inner select-none" id="capy-click-area">
-                
-                <!-- Floating Level Badge -->
-                <div class="absolute top-3 left-3 bg-slate-900/90 border border-amber-500/40 px-3 py-1 rounded-full text-[10px] font-bold text-amber-300 flex items-center gap-1.5">
-                    <span id="capy-hat-emoji">🧢</span> <span id="capy-skin-title">Capivara Simples</span>
-                </div>
+  <!-- SELETOR DE JOGOS -->
+  <nav class="max-w-4xl mx-auto px-4 pt-6 w-full">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 bg-hero-card p-2 rounded-2xl border border-hero-border">
+      <button onclick="switchGame('brawl')" id="nav-brawl" class="py-2.5 px-3 rounded-xl font-action text-lg tracking-wide font-bold transition-all bg-hero-accent text-white glow-accent">
+        ⚔️ BRAWL HERO
+      </button>
+      <button onclick="switchGame('runner')" id="nav-runner" class="py-2.5 px-3 rounded-xl font-action text-lg tracking-wide font-bold transition-all text-gray-400 hover:text-white">
+        🛹 HERO SKATE
+      </button>
+      <button onclick="switchGame('clicker')" id="nav-clicker" class="py-2.5 px-3 rounded-xl font-action text-lg tracking-wide font-bold transition-all text-gray-400 hover:text-white">
+        💥 HERO CLICKER
+      </button>
+      <button onclick="switchGame('quiz')" id="nav-quiz" class="py-2.5 px-3 rounded-xl font-action text-lg tracking-wide font-bold transition-all text-gray-400 hover:text-white">
+        🧠 QUIZ HERO
+      </button>
+    </div>
+  </nav>
 
-                <!-- Capybara Avatar -->
-                <div id="main-capy-avatar" onclick="tapCapybara(event)" class="text-8xl md:text-9xl cursor-pointer transition-transform duration-75 select-none relative my-2 hover:scale-105">
-                    🦫
-                </div>
+  <!-- ÁREA DOS JOGOS -->
+  <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-grow">
 
-                <!-- Progress Bar to Next Level/Skin -->
-                <div class="w-full max-w-xs space-y-1 mt-2">
-                    <div class="flex justify-between text-[10px] text-slate-400 font-bold">
-                        <span>Evolução da Capivara</span>
-                        <span id="capy-level-percent">0%</span>
-                    </div>
-                    <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800">
-                        <div id="capy-progress-bar" class="bg-gradient-to-r from-amber-500 via-candy-pink to-purple-500 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Upgrades Panel -->
-            <div class="bg-candy-card rounded-3xl p-4 border border-candy-border space-y-3 shadow-xl">
-                <h4 class="font-game text-sm font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-cart-shopping text-candy-pink"></i> Melhorias & Dopamina
-                </h4>
-
-                <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
-                    <!-- Upgrade 1: Cafezinho -->
-                    <div onclick="buyUpgrade('coffee')" id="upg-coffee" class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-2 cursor-pointer hover:border-amber-500/50 transition">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl p-2 bg-amber-500/10 rounded-xl">☕</span>
-                            <div>
-                                <h5 class="text-xs font-bold text-white">Cafezinho Express</h5>
-                                <span class="text-[10px] text-amber-400 font-bold block">+1 Moeda por clique</span>
-                            </div>
-                        </div>
-                        <button id="btn-upg-coffee" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow">
-                            15 🪙
-                        </button>
-                    </div>
-
-                    <!-- Upgrade 2: Pão de Queijo -->
-                    <div onclick="buyUpgrade('paodequeijo')" id="upg-paodequeijo" class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-2 cursor-pointer hover:border-amber-500/50 transition">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl p-2 bg-amber-500/10 rounded-xl">🧀</span>
-                            <div>
-                                <h5 class="text-xs font-bold text-white">Pão de Queijo Quentinho</h5>
-                                <span class="text-[10px] text-emerald-400 font-bold block">+5 Moedas por segundo</span>
-                            </div>
-                        </div>
-                        <button id="btn-upg-paodequeijo" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow">
-                            50 🪙
-                        </button>
-                    </div>
-
-                    <!-- Upgrade 3: Guaraná Turbo -->
-                    <div onclick="buyUpgrade('guarana')" id="upg-guarana" class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-2 cursor-pointer hover:border-amber-500/50 transition">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl p-2 bg-emerald-500/10 rounded-xl">🥤</span>
-                            <div>
-                                <h5 class="text-xs font-bold text-white">Guaraná Turbo 2L</h5>
-                                <span class="text-[10px] text-emerald-400 font-bold block">+25 Moedas por segundo</span>
-                            </div>
-                        </div>
-                        <button id="btn-upg-guarana" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow">
-                            200 🪙
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <!-- JOGO 1: BRAWL HERO 2D (ARENA ESTILO BRAWL STARS) -->
+    <section id="game-brawl" class="space-y-4">
+      <div class="bg-hero-card p-4 rounded-3xl border border-hero-border flex items-center justify-between">
+        <div>
+          <h2 class="font-action text-2xl font-bold text-white leading-none">BRAWL HERO: ARENA</h2>
+          <p class="text-xs text-gray-400">Arraste/Toque para mover seu herói e atirar nos robôs inimigos!</p>
         </div>
+        <button onclick="startBrawlGame()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-hero-cyan to-blue-600 font-action text-lg font-bold text-black glow-cyan">
+          INICIAR ARENA
+        </button>
+      </div>
 
-        <!-- VIEW 2: MATCH-3 DOCES DO BRASIL -->
-        <div id="view-match3" class="space-y-4 hidden">
-            <!-- Game Top Score Bar -->
-            <div class="bg-candy-card p-3.5 rounded-3xl border border-candy-border flex items-center justify-between shadow-xl">
-                <div>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Pontos</span>
-                    <span id="m3-score" class="font-game text-2xl font-extrabold text-candy-pink">0</span>
-                </div>
-                <div class="text-center">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Jogadas</span>
-                    <span id="m3-moves" class="font-game text-2xl font-extrabold text-amber-400">15</span>
-                </div>
-                <button onclick="initMatch3Grid()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl border border-slate-700">
-                    <i class="fa-solid fa-rotate-right"></i> Novo
-                </button>
-            </div>
-
-            <!-- Match 3 Game Board Grid (5x5) -->
-            <div class="bg-gradient-to-b from-slate-900 to-candy-card p-3 rounded-3xl border border-candy-border shadow-2xl">
-                <div id="m3-grid-container" class="grid grid-cols-5 gap-2 aspect-square w-full max-w-[340px] mx-auto p-1 bg-slate-950/80 rounded-2xl border border-slate-800">
-                    <!-- Dynamic 5x5 grid generated in JS -->
-                </div>
-            </div>
-
-            <!-- Combo Message Banner -->
-            <div id="m3-combo-banner" class="p-3 rounded-2xl bg-gradient-to-r from-candy-pink/20 via-purple-500/20 to-amber-500/20 border border-candy-pink/30 text-center font-game text-xs font-bold text-candy-pinkLight min-h-[44px] flex items-center justify-center">
-                Combine 3 doces iguais para pontuar!
-            </div>
-        </div>
-
-        <!-- VIEW 3: CAPIVARA SKATE (1-BUTTON TIMING) -->
-        <div id="view-skate" class="space-y-4 hidden">
-            <!-- Top Score Bar -->
-            <div class="bg-candy-card p-3.5 rounded-3xl border border-candy-border flex items-center justify-between shadow-xl">
-                <div>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Distância</span>
-                    <span id="skate-distance" class="font-game text-2xl font-extrabold text-emerald-400">0 m</span>
-                </div>
-                <div>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Recorde</span>
-                    <span id="skate-highscore" class="font-game text-2xl font-extrabold text-amber-400">0 m</span>
-                </div>
-            </div>
-
-            <!-- Canvas Game Screen -->
-            <div class="relative bg-slate-950 rounded-3xl border border-candy-border overflow-hidden shadow-2xl h-64 flex flex-col items-center justify-center">
-                <canvas id="skate-canvas" class="w-full h-full block"></canvas>
-
-                <!-- Game Over Overlay -->
-                <div id="skate-gameover-modal" class="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center space-y-3 hidden">
-                    <span class="text-4xl">💥</span>
-                    <h4 id="skate-fail-msg" class="font-game text-lg font-bold text-candy-pink">Morreu em 3 segundos!</h4>
-                    <p class="text-xs text-slate-300">Sua capivara bateu no cone da Faria Lima!</p>
-                    <button onclick="restartSkateGame()" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-game font-bold text-sm rounded-2xl shadow-lg active:scale-95 transition">
-                        Tentar de Novo 🛹
-                    </button>
-                </div>
-            </div>
-
-            <!-- Giant ONE-BUTTON Jump Control -->
-            <button id="btn-skate-jump" onclick="triggerSkateJump()" class="w-full py-5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 text-slate-950 font-game font-extrabold text-xl rounded-3xl shadow-lg shadow-emerald-900/40 active:scale-95 transition flex items-center justify-center gap-3">
-                <i class="fa-solid fa-arrow-up text-2xl"></i>
-                <span>PULAR AGORA!</span>
-            </button>
-        </div>
-
-        <!-- VIEW 4: QUIZ ABSURDO -->
-        <div id="view-quiz" class="space-y-4 hidden">
-            <!-- Top Progress Bar -->
-            <div class="bg-candy-card p-3.5 rounded-3xl border border-candy-border flex items-center justify-between shadow-xl">
-                <span class="text-xs font-bold text-sky-400 font-game">Pergunta <span id="quiz-step-num">1</span> de 5</span>
-                <div class="flex items-center gap-1 text-xs text-amber-400 font-bold">
-                    <i class="fa-solid fa-star"></i> Pontos: <span id="quiz-score">0</span>
-                </div>
-            </div>
-
-            <!-- Quiz Card -->
-            <div class="bg-candy-card p-5 rounded-3xl border border-candy-border shadow-2xl space-y-4 relative min-h-[260px] flex flex-col justify-between" id="quiz-card-container">
-                <div class="space-y-2">
-                    <span id="quiz-badge" class="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold border border-sky-500/30 uppercase tracking-wider">
-                        Pegadinha de QI
-                    </span>
-                    <h3 id="quiz-question-text" class="font-game text-base font-bold text-white leading-snug">
-                        Pergunta aqui?
-                    </h3>
-                </div>
-
-                <!-- Options List Container -->
-                <div id="quiz-options-container" class="grid grid-cols-1 gap-2.5">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-
-            <!-- Quiz Result Shareable Modal -->
-            <div id="quiz-result-modal" class="bg-candy-card p-6 rounded-3xl border border-sky-500/40 text-center space-y-4 hidden shadow-2xl">
-                <span class="text-5xl">🎓</span>
-                <div class="space-y-1">
-                    <h3 class="font-game text-xl font-bold text-white">Resultado do Diagnóstico!</h3>
-                    <p id="quiz-final-title" class="text-xs font-bold text-sky-400">98% Capivara Master</p>
-                </div>
-                <p id="quiz-final-desc" class="text-xs text-slate-300 leading-relaxed">
-                    Você pensa fora da caixa e não cai em pegadinhas fáceis!
-                </p>
-                <button onclick="restartQuiz()" class="w-full py-3.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-game font-bold text-sm rounded-2xl shadow-lg transition">
-                    Refazer Quiz Absurdo
-                </button>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- MOBILE BOTTOM NAVIGATION BAR -->
-    <nav class="sticky bottom-0 z-40 bg-slate-950/95 border-t border-candy-border backdrop-blur-lg px-2 py-2">
-        <div class="grid grid-cols-5 gap-1 max-w-md mx-auto text-center font-game">
-            <button onclick="switchGame('hub')" id="nav-hub" class="py-2 rounded-2xl text-[10px] font-bold flex flex-col items-center gap-1 text-candy-pink">
-                <i class="fa-solid fa-house text-base"></i>
-                <span>Hub</span>
-            </button>
-            <button onclick="switchGame('clicker')" id="nav-clicker" class="py-2 rounded-2xl text-[10px] font-bold flex flex-col items-center gap-1 text-slate-500 hover:text-white">
-                <i class="fa-solid fa-hand-pointer text-base"></i>
-                <span>Clicker</span>
-            </button>
-            <button onclick="switchGame('match3')" id="nav-match3" class="py-2 rounded-2xl text-[10px] font-bold flex flex-col items-center gap-1 text-slate-500 hover:text-white">
-                <i class="fa-solid fa-cubes text-base"></i>
-                <span>Doces</span>
-            </button>
-            <button onclick="switchGame('skate')" id="nav-skate" class="py-2 rounded-2xl text-[10px] font-bold flex flex-col items-center gap-1 text-slate-500 hover:text-white">
-                <i class="fa-solid fa-person-skating text-base"></i>
-                <span>Skate</span>
-            </button>
-            <button onclick="switchGame('quiz')" id="nav-quiz" class="py-2 rounded-2xl text-[10px] font-bold flex flex-col items-center gap-1 text-slate-500 hover:text-white">
-                <i class="fa-solid fa-brain text-base"></i>
-                <span>Quiz</span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- JAVASCRIPT LOGIC ENGINE -->
-    <script>
-        let currentGame = 'hub';
-        let globalPoints = 0;
-
-        /* ========================================================
-           GAME 1: CAPIVARA CLICKER STATE & LOGIC
-           ======================================================== */
-        let clickerCoins = 0;
-        let clickerCPC = 1; // Coins Per Click
-        let clickerCPS = 0; // Coins Per Second
+      <div class="relative w-full aspect-[4/3] md:aspect-[16/9] bg-slate-950 rounded-3xl border-2 border-hero-border overflow-hidden shadow-2xl flex items-center justify-center">
+        <canvas id="brawlCanvas" class="w-full h-full block"></canvas>
         
-        const capySkins = [
-            { threshold: 0, title: "Capivara Simples", hat: "🧢" },
-            { threshold: 100, title: "Capivara Faria Limer", hat: "🎧" },
-            { threshold: 500, title: "Capivara Rainha", hat: "👑" },
-            { threshold: 2500, title: "Capivara Galáctica", hat: "🚀" }
-        ];
+        <!-- CONTROLES MOBILE -->
+        <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center pointer-events-none md:hidden">
+          <div class="text-[10px] text-gray-400 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md">
+            Toque na tela para mover e atirar
+          </div>
+          <button onclick="useSuperPower()" class="pointer-events-auto px-4 py-3 rounded-full bg-hero-accent text-white font-action text-lg font-bold glow-accent active:scale-95">
+            💥 ULT SPECIAL
+          </button>
+        </div>
+      </div>
+    </section>
 
-        const upgrades = {
-            coffee: { cost: 15, count: 0, type: 'cpc', val: 1 },
-            paodequeijo: { cost: 50, count: 0, type: 'cps', val: 5 },
-            guarana: { cost: 200, count: 0, type: 'cps', val: 25 }
+    <!-- JOGO 2: RUNNER SKATE DE AÇÃO -->
+    <section id="game-runner" class="space-y-4 hidden">
+      <div class="bg-hero-card p-4 rounded-3xl border border-hero-border flex items-center justify-between">
+        <div>
+          <h2 class="font-action text-2xl font-bold text-white leading-none">CAPIVARA HERO SKATE</h2>
+          <p class="text-xs text-gray-400">Toque na tela para pular os obstáculos na hora certa!</p>
+        </div>
+        <button onclick="startRunnerGame()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-hero-gold to-orange-500 font-action text-lg font-bold text-black glow-gold">
+          CORRER AGORA
+        </button>
+      </div>
+
+      <div class="relative w-full aspect-[16/9] bg-slate-950 rounded-3xl border-2 border-hero-border overflow-hidden shadow-2xl">
+        <canvas id="runnerCanvas" class="w-full h-full block"></canvas>
+      </div>
+    </section>
+
+    <!-- JOGO 3: HERO CLICKER EVOLUTION -->
+    <section id="game-clicker" class="space-y-4 hidden">
+      <div class="bg-hero-card p-6 rounded-3xl border border-hero-border text-center relative overflow-hidden">
+        <h2 class="font-action text-3xl font-bold text-hero-gold">EVOLUÇÃO DE HERÓIS</h2>
+        <p class="text-xs text-gray-400 mb-6">Toque rapidamente no monstro para causar dano e acumular poder!</p>
+
+        <div class="flex justify-center items-center my-6">
+          <button onclick="clickBoss(event)" class="w-44 h-44 rounded-full bg-gradient-to-br from-hero-purple via-hero-accent to-hero-gold p-1 shadow-2xl active:scale-95 transition-all glow-accent">
+            <div class="w-full h-full bg-hero-card rounded-full flex flex-col items-center justify-center border-2 border-white/20">
+              <span class="text-6xl animate-bounce">👾</span>
+              <span class="font-action text-xl text-hero-accent font-bold mt-1">CHEFÃO NÍVEL 1</span>
+            </div>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
+          <button onclick="buyUpgrade('dps')" class="p-3 bg-hero-bg rounded-2xl border border-hero-border text-left hover:border-hero-cyan transition-all">
+            <span class="block text-xs font-bold text-hero-cyan">Ajudante Automático</span>
+            <span class="text-[10px] text-gray-400">+5 dano/seg • Custo: 50 moedas</span>
+          </button>
+          <button onclick="buyUpgrade('click')" class="p-3 bg-hero-bg rounded-2xl border border-hero-border text-left hover:border-hero-gold transition-all">
+            <span class="block text-xs font-bold text-hero-gold">Super Golpe</span>
+            <span class="text-[10px] text-gray-400">+2 dano/clique • Custo: 30 moedas</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- JOGO 4: QUIZ HERO -->
+    <section id="game-quiz" class="space-y-4 hidden">
+      <div class="bg-hero-card p-6 rounded-3xl border border-hero-border">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="font-action text-2xl font-bold text-white">DESAFIO DE CONHECIMENTO & PEGADINHAS</h2>
+          <span class="text-xs font-action text-xl text-hero-cyan" id="quiz-score">Pontos: 0</span>
+        </div>
+
+        <div id="quiz-container" class="space-y-4">
+          <p id="quiz-question" class="text-sm md:text-base font-bold text-gray-200">Carregando pergunta...</p>
+          <div id="quiz-options" class="grid gap-2.5"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-hero-border py-4 text-center text-xs text-gray-500 bg-hero-bg">
+    Hero Arcade Hub • Jogos de Ação & Entretenimento de Alta Performance
+  </footer>
+
+  <script>
+    let globalCoins = 0;
+
+    function addCoins(amount) {
+      globalCoins += amount;
+      document.getElementById('global-coins').innerText = globalCoins;
+    }
+
+    // TROCA DE ABAS DE JOGO
+    function switchGame(gameKey) {
+      const games = ['brawl', 'runner', 'clicker', 'quiz'];
+      games.forEach(g => {
+        document.getElementById(`game-${g}`).classList.add('hidden');
+        document.getElementById(`nav-${g}`).className = "py-2.5 px-3 rounded-xl font-action text-lg tracking-wide font-bold transition-all text-gray-400 hover:text-white";
+      });
+
+      document.getElementById(`game-${gameKey}`).classList.remove('hidden');
+      const activeNav = document.getElementById(`nav-${gameKey}`);
+      activeNav.className = "py-2.5 px-3 rounded-xl font-action text-lg tracking-wide font-bold transition-all bg-hero-accent text-white glow-accent";
+
+      if(gameKey === 'brawl') startBrawlGame();
+      if(gameKey === 'runner') startRunnerGame();
+      if(gameKey === 'quiz') loadQuizQuestion();
+    }
+
+    // -------------------------------------------------------------
+    // MOTOR DO BRAWL HERO 2D (ARENA DE AÇÃO)
+    // -------------------------------------------------------------
+    let brawlCanvas, brawlCtx;
+    let hero = { x: 150, y: 150, radius: 14, color: '#00f0ff', speed: 3 };
+    let bullets = [];
+    let enemies = [];
+    let brawlRunning = false;
+
+    function startBrawlGame() {
+      brawlCanvas = document.getElementById('brawlCanvas');
+      brawlCtx = brawlCanvas.getContext('2d');
+      brawlCanvas.width = brawlCanvas.parentElement.clientWidth;
+      brawlCanvas.height = brawlCanvas.parentElement.clientHeight;
+
+      hero.x = brawlCanvas.width / 2;
+      hero.y = brawlCanvas.height / 2;
+      bullets = [];
+      enemies = [];
+      brawlRunning = true;
+
+      // Evento de Toque/Clique para Mover e Atirar
+      brawlCanvas.onclick = (e) => {
+        const rect = brawlCanvas.getBoundingClientRect();
+        const targetX = e.clientX - rect.left;
+        const targetY = e.clientY - rect.top;
+
+        // Dispara tiro na direção do toque
+        const angle = Math.atan2(targetY - hero.y, targetX - hero.x);
+        bullets.push({
+          x: hero.x,
+          y: hero.y,
+          vx: Math.cos(angle) * 7,
+          vy: Math.sin(angle) * 7
+        });
+
+        // Move hero ligeiramente em direção ao toque
+        hero.x += Math.cos(angle) * 15;
+        hero.y += Math.sin(angle) * 15;
+      };
+
+      requestAnimationFrame(updateBrawlLoop);
+    }
+
+    function updateBrawlLoop() {
+      if(!brawlRunning) return;
+
+      brawlCtx.fillStyle = '#0a0814';
+      brawlCtx.fillRect(0, 0, brawlCanvas.width, brawlCanvas.height);
+
+      // Desenha Herói
+      brawlCtx.beginPath();
+      brawlCtx.arc(hero.x, hero.y, hero.radius, 0, Math.PI * 2);
+      brawlCtx.fillStyle = hero.color;
+      brawlCtx.shadowColor = '#00f0ff';
+      brawlCtx.shadowBlur = 15;
+      brawlCtx.fill();
+      brawlCtx.shadowBlur = 0;
+
+      // Spawn de inimigos aleatórios
+      if(Math.random() < 0.03 && enemies.length < 8) {
+        enemies.push({
+          x: Math.random() * brawlCanvas.width,
+          y: Math.random() < 0.5 ? 0 : brawlCanvas.height,
+          radius: 12,
+          color: '#ff0055'
+        });
+      }
+
+      // Atualiza Tiros
+      bullets.forEach((b, bi) => {
+        b.x += b.vx;
+        b.y += b.vy;
+
+        brawlCtx.beginPath();
+        brawlCtx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+        brawlCtx.fillStyle = '#ffb703';
+        brawlCtx.fill();
+
+        // Colisão Tiro x Inimigo
+        enemies.forEach((en, ei) => {
+          const dist = Math.hypot(b.x - en.x, b.y - en.y);
+          if(dist < en.radius + 4) {
+            enemies.splice(ei, 1);
+            bullets.splice(bi, 1);
+            addCoins(10);
+          }
+        });
+      });
+
+      // Atualiza Inimigos
+      enemies.forEach((en) => {
+        const angle = Math.atan2(hero.y - en.y, hero.x - en.x);
+        en.x += Math.cos(angle) * 1.5;
+        en.y += Math.sin(angle) * 1.5;
+
+        brawlCtx.beginPath();
+        brawlCtx.arc(en.x, en.y, en.radius, 0, Math.PI * 2);
+        brawlCtx.fillStyle = en.color;
+        brawlCtx.shadowColor = '#ff0055';
+        brawlCtx.shadowBlur = 10;
+        brawlCtx.fill();
+        brawlCtx.shadowBlur = 0;
+      });
+
+      requestAnimationFrame(updateBrawlLoop);
+    }
+
+    function useSuperPower() {
+      // Dispara 12 tiros em todas as direções (ULT)
+      for(let i=0; i<12; i++) {
+        const angle = (Math.PI * 2 / 12) * i;
+        bullets.push({
+          x: hero.x,
+          y: hero.y,
+          vx: Math.cos(angle) * 8,
+          vy: Math.sin(angle) * 8
+        });
+      }
+    }
+
+    // -------------------------------------------------------------
+    // MOTOR DO RUNNER SKATE
+    // -------------------------------------------------------------
+    let runnerCanvas, runnerCtx;
+    let runnerY = 120, runnerVy = 0, isJumping = false;
+    let obstacleX = 300;
+
+    function startRunnerGame() {
+      runnerCanvas = document.getElementById('runnerCanvas');
+      runnerCtx = runnerCanvas.getContext('2d');
+      runnerCanvas.width = runnerCanvas.parentElement.clientWidth;
+      runnerCanvas.height = runnerCanvas.parentElement.clientHeight;
+
+      runnerY = runnerCanvas.height - 40;
+      obstacleX = runnerCanvas.width;
+
+      runnerCanvas.onclick = () => {
+        if(!isJumping) {
+          runnerVy = -10;
+          isJumping = true;
+        }
+      };
+
+      requestAnimationFrame(updateRunnerLoop);
+    }
+
+    function updateRunnerLoop() {
+      runnerCtx.fillStyle = '#0f172a';
+      runnerCtx.fillRect(0, 0, runnerCanvas.width, runnerCanvas.height);
+
+      // Chão
+      runnerCtx.fillStyle = '#1e293b';
+      runnerCtx.fillRect(0, runnerCanvas.height - 20, runnerCanvas.width, 20);
+
+      // Capivara / Jogador
+      runnerVy += 0.5;
+      runnerY += runnerVy;
+      if(runnerY >= runnerCanvas.height - 40) {
+        runnerY = runnerCanvas.height - 40;
+        isJumping = false;
+      }
+
+      runnerCtx.fillStyle = '#ffb703';
+      runnerCtx.fillRect(40, runnerY, 24, 24);
+
+      // Obstáculo
+      obstacleX -= 4;
+      if(obstacleX < -20) {
+        obstacleX = runnerCanvas.width;
+        addCoins(5);
+      }
+
+      runnerCtx.fillStyle = '#ff0055';
+      runnerCtx.fillRect(obstacleX, runnerCanvas.height - 40, 20, 20);
+
+      requestAnimationFrame(updateRunnerLoop);
+    }
+
+    // -------------------------------------------------------------
+    // LOGICA DO CLICKER
+    // -------------------------------------------------------------
+    function clickBoss(e) {
+      addCoins(2);
+    }
+
+    function buyUpgrade(type) {
+      if(type === 'click' && globalCoins >= 30) {
+        globalCoins -= 30;
+        addCoins(0);
+        alert("Super Golpe Comprado! +Dano por clique ativado.");
+      } else if(type === 'dps' && globalCoins >= 50) {
+        globalCoins -= 50;
+        addCoins(0);
+        setInterval(() => addCoins(2), 1000);
+        alert("Ajudante Comprado! Moedas automáticas geradas.");
+      } else {
+        alert("Moedas insuficientes!");
+      }
+    }
+
+    // -------------------------------------------------------------
+    // LOGICA DO QUIZ HERO
+    // -------------------------------------------------------------
+    const questions = [
+      { q: "Qual herói é conhecido pelo seu martelo mágico?", opts: ["Batman", "Thor", "Homem de Ferro", "Hulk"], a: 1 },
+      { q: "Em um jogo de arena, o que o botão 'ULT' faz?", opts: ["Faz o personagem dormir", "Ativa o Poder Especial máximo", "Fecha o aplicativo", "Muda a cor da tela"], a: 1 },
+      { q: "Se 3 capivaras estão em um skate e 1 pula, quantas ficam no skate?", opts: ["Nenhuma (todas se assustam)", "2 Capivaras", "3 Capivaras", "4 Capivaras"], a: 1 }
+    ];
+
+    let currentQ = 0;
+    function loadQuizQuestion() {
+      const q = questions[currentQ];
+      document.getElementById('quiz-question').innerText = q.q;
+      const optsBox = document.getElementById('quiz-options');
+      optsBox.innerHTML = '';
+
+      q.opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3.5 rounded-2xl bg-hero-bg border border-hero-border hover:border-hero-cyan text-xs font-bold transition-all";
+        btn.innerText = opt;
+        btn.onclick = () => {
+          if(idx === q.a) {
+            addCoins(20);
+            alert("Correto! +20 Moedas!");
+          } else {
+            alert("Ops! Resposta errada!");
+          }
+          currentQ = (currentQ + 1) % questions.length;
+          loadQuizQuestion();
         };
+        optsBox.appendChild(btn);
+      });
+    }
 
-        function tapCapybara(e) {
-            clickerCoins += clickerCPC;
-            globalPoints += clickerCPC;
-            updateGlobalScore();
-            
-            // Visual bounce
-            const avatar = document.getElementById('main-capy-avatar');
-            avatar.classList.remove('click-bounce');
-            void avatar.offsetWidth; // trigger reflow
-            avatar.classList.add('click-bounce');
-
-            // Floating +1 number
-            createFloatingNumber(e.clientX, e.clientY, `+${clickerCPC}`);
-            updateClickerUI();
-        }
-
-        function createFloatingNumber(x, y, text) {
-            const num = document.createElement('div');
-            num.className = 'float-number';
-            num.innerText = text;
-            num.style.left = `${x - 15}px`;
-            num.style.top = `${y - 30}px`;
-            document.body.appendChild(num);
-            setTimeout(() => num.remove(), 800);
-        }
-
-        function buyUpgrade(key) {
-            const upg = upgrades[key];
-            if (clickerCoins >= upg.cost) {
-                clickerCoins -= upg.cost;
-                upg.count++;
-                
-                if (upg.type === 'cpc') clickerCPC += upg.val;
-                if (upg.type === 'cps') clickerCPS += upg.val;
-
-                upg.cost = Math.floor(upg.cost * 1.6);
-                updateClickerUI();
-            }
-        }
-
-        function updateClickerUI() {
-            document.getElementById('clicker-coins').innerText = Math.floor(clickerCoins);
-            document.getElementById('clicker-cpc').innerText = clickerCPC;
-            document.getElementById('clicker-cps').innerText = clickerCPS;
-
-            // Upgrade Buttons Text & States
-            document.getElementById('btn-upg-coffee').innerText = `${upgrades.coffee.cost} 🪙`;
-            document.getElementById('btn-upg-paodequeijo').innerText = `${upgrades.paodequeijo.cost} 🪙`;
-            document.getElementById('btn-upg-guarana').innerText = `${upgrades.guarana.cost} 🪙`;
-
-            // Skin Level Logic
-            let currentSkin = capySkins[0];
-            let nextThreshold = capySkins[1].threshold;
-            
-            for (let i = capySkins.length - 1; i >= 0; i--) {
-                if (clickerCoins >= capySkins[i].threshold) {
-                    currentSkin = capySkins[i];
-                    nextThreshold = capySkins[i+1] ? capySkins[i+1].threshold : capySkins[i].threshold;
-                    break;
-                }
-            }
-
-            document.getElementById('capy-skin-title').innerText = currentSkin.title;
-            document.getElementById('capy-hat-emoji').innerText = currentSkin.hat;
-
-            const progress = Math.min(100, Math.floor((clickerCoins / nextThreshold) * 100));
-            document.getElementById('capy-progress-bar').style.width = `${progress}%`;
-            document.getElementById('capy-level-percent').innerText = `${progress}%`;
-        }
-
-        // Idle Loop for CPS
-        setInterval(() => {
-            if (clickerCPS > 0) {
-                clickerCoins += clickerCPS / 10;
-                globalPoints += clickerCPS / 10;
-                updateGlobalScore();
-                updateClickerUI();
-            }
-        }, 100);
-
-        /* ========================================================
-           GAME 2: MATCH-3 DOCES DO BRASIL LOGIC
-           ======================================================== */
-        const candyTypes = ['🍫', '🥥', '🍮', '🍇', '🥜']; // Brigadeiro, Beijinho, Quindim, Açaí, Paçoca
-        let m3Grid = [];
-        let m3Score = 0;
-        let m3Moves = 15;
-        let selectedCell = null;
-
-        function initMatch3Grid() {
-            m3Score = 0;
-            m3Moves = 15;
-            document.getElementById('m3-score').innerText = m3Score;
-            document.getElementById('m3-moves').innerText = m3Moves;
-            document.getElementById('m3-combo-banner').innerText = "Combine 3 doces iguais para pontuar!";
-
-            const container = document.getElementById('m3-grid-container');
-            container.innerHTML = '';
-            m3Grid = [];
-
-            for (let r = 0; r < 5; r++) {
-                m3Grid[r] = [];
-                for (let c = 0; c < 5; c++) {
-                    const randomCandy = candyTypes[Math.floor(Math.random() * candyTypes.length)];
-                    m3Grid[r][c] = randomCandy;
-
-                    const cell = document.createElement('div');
-                    cell.className = 'w-full h-full bg-slate-900 rounded-xl flex items-center justify-center text-2xl border border-slate-800 cursor-pointer active:scale-90 transition-all select-none';
-                    cell.dataset.r = r;
-                    cell.dataset.c = c;
-                    cell.innerText = randomCandy;
-                    cell.onclick = () => handleCandyClick(r, c, cell);
-                    container.appendChild(cell);
-                }
-            }
-        }
-
-        function handleCandyClick(r, c, el) {
-            if (m3Moves <= 0) return;
-
-            if (!selectedCell) {
-                selectedCell = { r, c, el };
-                el.classList.add('border-candy-pink', 'bg-purple-900/40', 'scale-105');
-            } else {
-                const prev = selectedCell;
-                // Check adjacency (horizontal or vertical)
-                const isAdjacent = (Math.abs(prev.r - r) + Math.abs(prev.c - c)) === 1;
-
-                if (isAdjacent) {
-                    // Swap candies
-                    const temp = m3Grid[prev.r][prev.c];
-                    m3Grid[prev.r][prev.c] = m3Grid[r][c];
-                    m3Grid[r][c] = temp;
-
-                    m3Moves--;
-                    document.getElementById('m3-moves').innerText = m3Moves;
-
-                    renderMatch3Grid();
-                    checkMatch3Combos();
-                }
-
-                prev.el.classList.remove('border-candy-pink', 'bg-purple-900/40', 'scale-105');
-                selectedCell = null;
-            }
-        }
-
-        function renderMatch3Grid() {
-            const container = document.getElementById('m3-grid-container');
-            const cells = container.children;
-            let idx = 0;
-            for (let r = 0; r < 5; r++) {
-                for (let c = 0; c < 5; c++) {
-                    cells[idx].innerText = m3Grid[r][c];
-                    idx++;
-                }
-            }
-        }
-
-        function checkMatch3Combos() {
-            let matchesFound = false;
-
-            // Horizontal Matches
-            for (let r = 0; r < 5; r++) {
-                for (let c = 0; c < 3; c++) {
-                    if (m3Grid[r][c] && m3Grid[r][c] === m3Grid[r][c+1] && m3Grid[r][c] === m3Grid[r][c+2]) {
-                        matchesFound = true;
-                        m3Score += 100;
-                        globalPoints += 100;
-                        m3Grid[r][c] = candyTypes[Math.floor(Math.random() * candyTypes.length)];
-                        m3Grid[r][c+1] = candyTypes[Math.floor(Math.random() * candyTypes.length)];
-                        m3Grid[r][c+2] = candyTypes[Math.floor(Math.random() * candyTypes.length)];
-                    }
-                }
-            }
-
-            if (matchesFound) {
-                document.getElementById('m3-score').innerText = m3Score;
-                document.getElementById('m3-combo-banner').innerText = "🎉 COMBO DOCE! +300 PONTOS!";
-                confetti({ particleCount: 25, spread: 50, origin: { y: 0.6 } });
-                updateGlobalScore();
-                renderMatch3Grid();
-            }
-        }
-
-        /* ========================================================
-           GAME 3: CAPIVARA SKATE CANVAS LOGIC
-           ======================================================== */
-        let skateCanvas, skateCtx;
-        let skateRunning = false;
-        let skatePosY = 0;
-        let skateVelocityY = 0;
-        let skateIsJumping = false;
-        let skateDistance = 0;
-        let skateHighscore = 0;
-        let skateObstacleX = 300;
-
-        function startSkateGame() {
-            skateCanvas = document.getElementById('skate-canvas');
-            skateCtx = skateCanvas.getContext('2d');
-            
-            // Adjust resolution
-            skateCanvas.width = skateCanvas.offsetWidth;
-            skateCanvas.height = skateCanvas.offsetHeight;
-
-            skateDistance = 0;
-            skatePosY = skateCanvas.height - 50;
-            skateVelocityY = 0;
-            skateIsJumping = false;
-            skateObstacleX = skateCanvas.width + 100;
-            skateRunning = true;
-
-            document.getElementById('skate-gameover-modal').classList.add('hidden');
-            requestAnimationFrame(updateSkateLoop);
-        }
-
-        function triggerSkateJump() {
-            if (!skateIsJumping && skateRunning) {
-                skateVelocityY = -12;
-                skateIsJumping = true;
-            }
-        }
-
-        function updateSkateLoop() {
-            if (!skateRunning) return;
-
-            // Physics update
-            skatePosY += skateVelocityY;
-            skateVelocityY += 0.65; // gravity
-
-            const groundLevel = skateCanvas.height - 50;
-            if (skatePosY >= groundLevel) {
-                skatePosY = groundLevel;
-                skateIsJumping = false;
-            }
-
-            // Move Obstacle
-            skateObstacleX -= 4.5;
-            if (skateObstacleX < -30) {
-                skateObstacleX = skateCanvas.width + Math.random() * 150;
-                skateDistance += 10;
-                globalPoints += 10;
-                updateGlobalScore();
-            }
-
-            document.getElementById('skate-distance').innerText = `${skateDistance} m`;
-
-            // Collision Detection
-            const capyX = 50;
-            const capySize = 35;
-            if (skateObstacleX > capyX && skateObstacleX < capyX + capySize && skatePosY > groundLevel - 20) {
-                // Game Over!
-                skateRunning = false;
-                if (skateDistance > skateHighscore) {
-                    skateHighscore = skateDistance;
-                    document.getElementById('skate-highscore').innerText = `${skateHighscore} m`;
-                }
-                document.getElementById('skate-fail-msg').innerText = `Morreu em ${skateDistance} metros!`;
-                document.getElementById('skate-gameover-modal').classList.remove('hidden');
-                return;
-            }
-
-            // Clear Canvas
-            skateCtx.clearRect(0, 0, skateCanvas.width, skateCanvas.height);
-
-            // Draw Ground Line
-            skateCtx.strokeStyle = '#322659';
-            skateCtx.lineWidth = 4;
-            skateCtx.beginPath();
-            skateCtx.moveTo(0, groundLevel + 25);
-            skateCtx.lineTo(skateCanvas.width, groundLevel + 25);
-            skateCtx.stroke();
-
-            // Draw Capybara Emoji Avatar
-            skateCtx.font = '32px sans-serif';
-            skateCtx.fillText('🛹', capyX - 5, skatePosY + 10);
-            skateCtx.fillText('🦫', capyX, skatePosY - 5);
-
-            // Draw Obstacle Cone Emoji
-            skateCtx.fillText('⚠️', skateObstacleX, groundLevel + 20);
-
-            requestAnimationFrame(updateSkateLoop);
-        }
-
-        function restartSkateGame() {
-            startSkateGame();
-        }
-
-        /* ========================================================
-           GAME 4: QUIZ ABSURDO MEME LOGIC
-           ======================================================== */
-        const quizQuestions = [
-            {
-                q: "Qual capivara está mais feliz?",
-                badge: "Pegadinha Visual",
-                options: [
-                    { text: "🦫 A da esquerda", correct: false },
-                    { text: "🦫 A da direita", correct: false },
-                    { text: "☕ A que está tomando café!", correct: true }
-                ]
-            },
-            {
-                q: "Como se chama o doce mais sagrado do Brasil?",
-                badge: "Cultura Pop",
-                options: [
-                    { text: "Brigadeiro de Festa", correct: true },
-                    { text: "Mousse de Maracujá", correct: false },
-                    { text: "Bolo de Rolo", correct: false }
-                ]
-            },
-            {
-                q: "Aperte o botão VERDE para avançar:",
-                badge: "Atenção de Raciocínio",
-                options: [
-                    { text: "Botão Azul", correct: false, color: 'bg-blue-600' },
-                    { text: "Verde (Escrito em Vermelho)", correct: false, color: 'bg-red-600' },
-                    { text: "VERDE DE VERDADE", correct: true, color: 'bg-emerald-600' }
-                ]
-            }
-        ];
-
-        let quizStep = 0;
-        let quizScore = 0;
-
-        function renderQuizStep() {
-            if (quizStep >= quizQuestions.length) {
-                // Show Result
-                document.getElementById('quiz-card-container').classList.add('hidden');
-                document.getElementById('quiz-result-modal').classList.remove('hidden');
-                confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
-                return;
-            }
-
-            const qData = quizQuestions[quizStep];
-            document.getElementById('quiz-step-num').innerText = quizStep + 1;
-            document.getElementById('quiz-badge').innerText = qData.badge;
-            document.getElementById('quiz-question-text').innerText = qData.q;
-
-            const optsContainer = document.getElementById('quiz-options-container');
-            optsContainer.innerHTML = '';
-
-            qData.options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = `w-full py-3 px-4 rounded-2xl ${opt.color || 'bg-slate-900'} border border-slate-700 text-xs font-game font-bold text-white shadow hover:scale-102 active:scale-95 transition text-left`;
-                btn.innerText = opt.text;
-                btn.onclick = () => answerQuiz(opt.correct);
-                optsContainer.appendChild(btn);
-            });
-        }
-
-        function answerQuiz(isCorrect) {
-            if (isCorrect) {
-                quizScore += 100;
-                globalPoints += 100;
-                document.getElementById('quiz-score').innerText = quizScore;
-                updateGlobalScore();
-            }
-            quizStep++;
-            renderQuizStep();
-        }
-
-        function restartQuiz() {
-            quizStep = 0;
-            quizScore = 0;
-            document.getElementById('quiz-score').innerText = 0;
-            document.getElementById('quiz-card-container').classList.remove('hidden');
-            document.getElementById('quiz-result-modal').classList.add('hidden');
-            renderQuizStep();
-        }
-
-        /* ========================================================
-           GLOBAL APP SWITCHER
-           ======================================================== */
-        function switchGame(target) {
-            currentGame = target;
-
-            // Hide all views
-            document.getElementById('view-hub').classList.add('hidden');
-            document.getElementById('view-clicker').classList.add('hidden');
-            document.getElementById('view-match3').classList.add('hidden');
-            document.getElementById('view-skate').classList.add('hidden');
-            document.getElementById('view-quiz').classList.add('hidden');
-
-            // Reset Nav Styles
-            ['hub', 'clicker', 'match3', 'skate', 'quiz'].forEach(id => {
-                const btn = document.getElementById(`nav-${id}`);
-                if (btn) btn.className = "py-2 rounded-2xl text-[10px] font-bold flex flex-col items-center gap-1 text-slate-500 hover:text-white";
-            });
-
-            // Activate Target View
-            document.getElementById(`view-${target}`).classList.remove('hidden');
-            const activeNav = document.getElementById(`nav-${target}`);
-            if (activeNav) activeNav.className = "py-2 rounded-2xl text-[10px] font-bold flex flex-col items-center gap-1 text-candy-pink";
-
-            // Init Game specific logic on view change
-            if (target === 'match3') initMatch3Grid();
-            if (target === 'skate') startSkateGame();
-            if (target === 'quiz') restartQuiz();
-        }
-
-        function updateGlobalScore() {
-            document.getElementById('global-score').innerText = `${Math.floor(globalPoints)} pts`;
-        }
-
-        // On Load Init
-        window.onload = function() {
-            updateClickerUI();
-        };
-    </script>
+    // INICIA NO BRAWL HERO
+    switchGame('brawl');
+  </script>
 </body>
 </html>
